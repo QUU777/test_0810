@@ -1,46 +1,25 @@
-import { notFound } from "next/navigation";
-// This is a placeholder. We will implement MDX loading later.
-// import { allDocs } from "@/.contentlayer/generated";
-// import { Mdx } from "@/components/mdx-components";
+// src/app/docs/[...slug]/page.ts
+import type { Metadata } from "next";
 
-interface DocPageProps {
-  params: {
-    slug: string[];
-  };
-}
+type Params = { slug: string[] };
 
-async function getDocFromParams(params: DocPageProps["params"]) {
-  const slug = params.slug?.join("/") || "";
-  // const doc = allDocs.find((doc) => doc.slugAsParams === slug);
-  const doc = {slugAsParams: slug, title: "Placeholder Title", body: {code: "<h1>Placeholder</h1>"}}; // Placeholder
-
-  if (!doc) {
-    null;
-  }
-
-  return doc;
-}
-
-export default async function DocPage({ params }: DocPageProps) {
-  const doc = await getDocFromParams(params);
-
-  if (!doc) {
-    notFound();
-  }
-
+export default async function DocPage(
+  { params }: { params: Promise<Params> }
+) {
+  const { slug } = await params; // ← Promise を await する
+  // ここにページ本体
   return (
-    <main className="relative py-6 lg:gap-10 lg:py-8">
-      <div className="mx-auto w-full min-w-0">
-        <div className="space-y-2">
-          <h1 className="scroll-m-20 text-4xl font-bold tracking-tight">
-            {doc.title}
-          </h1>
-        </div>
-        {/* <Mdx code={doc.body.code} /> */}
-        <div className="prose">
-            This is a placeholder for the document content. The slug is: {doc.slugAsParams}
-        </div>
-      </div>
+    <main className="p-8">
+      <h1 className="text-2xl font-bold">Docs: {slug?.join("/")}</h1>
     </main>
   );
+}
+
+export async function generateMetadata(
+  { params }: { params: Promise<Params> }
+): Promise<Metadata> {
+  const { slug } = await params; // ← 同様に await
+  return {
+    title: `Docs - ${slug?.join("/") || "index"}`,
+  };
 }
